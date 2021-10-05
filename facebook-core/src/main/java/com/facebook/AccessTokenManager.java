@@ -24,6 +24,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -161,7 +162,12 @@ public final class AccessTokenManager {
 
     Intent intent = new Intent(context, CurrentAccessTokenExpirationBroadcastReceiver.class);
     intent.setAction(ACTION_CURRENT_ACCESS_TOKEN_CHANGED);
-    PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+    PendingIntent alarmIntent;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        alarmIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+    } else {
+        alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+    }
 
     try {
       alarmManager.set(AlarmManager.RTC, accessToken.getExpires().getTime(), alarmIntent);
